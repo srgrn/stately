@@ -3,7 +3,7 @@
 	[
 		{
 			"follow_symlinks": true,
-			"path": "e:\\dev\\go\\src\\github.com\\srgrn\\stately"
+			"path": "."
 		}
 	]
 }
