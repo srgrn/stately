@@ -2,7 +2,7 @@
 
 package stately
 
-import "fmt"
+//import "fmt"
 
 const branch = "v0.1.0"
 
@@ -11,17 +11,22 @@ func Version() string {
 }
 
 type source struct {
-	Target string
-	Url string
+	Target     string
+	Url        string
+	SourceType *vcs
 }
 
 type Config struct {
-	Name string
+	Name    string
 	Sources []source
 }
 
 func (c *Config) Get() {
 	for _, source := range c.Sources {
-		
+
 	}
+}
+
+func (s *source) set_type() {
+	s.SourceType = vcsGit
 }
