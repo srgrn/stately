@@ -40,7 +40,11 @@ func runGet(cmd *Command, args []string) {
 	for _, source := range config.Sources {
 		source.set_type()
 		if source.Branch == "" {
-			source.Branch = source.SourceType.BaseBranchName
+			if config.BaseBranch == "" {
+				source.Branch = source.SourceType.BaseBranchName
+			} else {
+				source.Branch = config.BaseBranch
+			}
 		}
 		go create(source, done)
 
