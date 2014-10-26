@@ -14,7 +14,7 @@ Running without any flag will search for a file called projectdef.toml in the cu
 The -p flag allows to specify a file to work on.
 The -r flag allows to specify a remote file (from a git repository)
 	`,
-	CustomFlags: false,
+	CustomFlags: true,
 }
 
 var getP = cmdGet.Flag.String("p", "projectdef.toml", "Specify project definition file")

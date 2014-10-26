@@ -103,3 +103,7 @@ func expand(match map[string]string, s string) string {
 	}
 	return s
 }
+
+func set_type(s *source) {
+	s.SourceType = vcsGit
+}

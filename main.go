@@ -96,7 +96,7 @@ func main() {
 	for _, cmd := range commands {
 		if cmd.Name() == args[0] && cmd.Run != nil {
 			cmd.Flag.Usage = func() { cmd.Usage() }
-			if cmd.CustomFlags {
+			if !cmd.CustomFlags {
 				args = args[1:]
 			} else {
 				cmd.Flag.Parse(args[1:])
