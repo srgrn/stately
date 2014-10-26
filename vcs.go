@@ -1,4 +1,4 @@
-package stately
+package main
 
 import (
 	"bytes"
@@ -12,12 +12,13 @@ type vcs struct {
 	name string
 	cmd  string // name of binary to invoke command
 
-	createCmd   string // command to download a fresh copy of a repository
-	downloadCmd string // command to download updates into an existing repository
+	createCmd      string // command to download a fresh copy of a repository
+	downloadCmd    string // command to download updates into an existing repository
+	BaseBranchName string // the name of the default branch/revision to get when non is given
 }
 
-func (v *vcs) create(dir, repo string) error {
-	return v.run(".", v.createCmd, "dir", dir, "repo", repo)
+func (v *vcs) create(dir, repo, branch string) error {
+	return v.run(".", v.createCmd, "dir", dir, "repo", repo, "branch", branch)
 }
 
 // download downloads any new changes for the repo in dir.
@@ -29,16 +30,18 @@ var vcsGit = &vcs{
 	name: "Git",
 	cmd:  "git",
 
-	createCmd:   "clone {repo} {dir}",
-	downloadCmd: "pull --ff-only",
+	createCmd:      "clone {repo} {dir} -b {branch}",
+	downloadCmd:    "pull --ff-only",
+	BaseBranchName: "master",
 }
 
 var vcsSvn = &vcs{
 	name: "Subversion",
 	cmd:  "svn",
 
-	createCmd:   "checkout {repo} {dir}",
-	downloadCmd: "update",
+	createCmd:      "checkout {repo} {dir} -r {branch}",
+	downloadCmd:    "update",
+	BaseBranchName: "HEAD",
 }
 
 func (v *vcs) run(dir string, cmd string, keyval ...string) error {
@@ -99,4 +102,8 @@ func expand(match map[string]string, s string) string {
 		s = strings.Replace(s, "{"+k+"}", v, -1)
 	}
 	return s
+}
+
+func set_type(s *source) {
+	s.SourceType = vcsGit
 }
