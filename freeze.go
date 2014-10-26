@@ -2,8 +2,9 @@ package main
 
 import (
 	"fmt"
+	"github.com/BurntSushi/toml"
 	"os"
-	//"github.com/BurntSushi/toml"
+	"path/filepath"
 )
 
 var cmdFreeze = &Command{
@@ -27,18 +28,36 @@ func runFreeze(cmd *Command, args []string) {
 		fmt.Println("target file name missing")
 		return
 	}
+	newFileName := args[0]
 	var config Config
 	curr, err := os.Open(".")
 	if err != nil {
 		fmt.Println("Some Error")
 	}
 
-	folders, err := curr.Readdirnames(0)
-	for _, f := range folders {
-		fmt.Println(f)
-		var s source
-		sp := &s
-		sp.set_type()
-		config.Sources = append(config.Sources, s)
+	files, err := curr.Readdir(0)
+	for _, f := range files {
+		if f.IsDir() {
+			//fmt.Println(f.Name())
+			var s source
+			sp := &source{}
+			s.Target = f.Name()
+			sp.set_type()
+			//s.Branch = sp.get_branch()
+			config.Sources = append(config.Sources, s)
+		}
 	}
+	pwd, err := os.Getwd()
+	if err != nil {
+	}
+	config.Name = filepath.Base(pwd)
+	file, err := os.Create(newFileName)
+	if err != nil {
+		// handle the error here
+		return
+	}
+	defer file.Close()
+	encoder := toml.NewEncoder(file)
+	encoder.Encode(config)
+
 }
