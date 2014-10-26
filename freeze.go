@@ -32,9 +32,13 @@ func runFreeze(cmd *Command, args []string) {
 	if err != nil {
 		fmt.Println("Some Error")
 	}
+
 	folders, err := curr.Readdirnames(0)
 	for _, f := range folders {
+		fmt.Println(f)
 		var s source
-		source.set_type()
+		sp := &s
+		sp.set_type()
+		config.Sources = append(config.Sources, s)
 	}
 }
