@@ -101,9 +101,9 @@ func main() {
 				args = args[1:]
 			} else {
 				cmd.Flag.Parse(args[1:])
-				fmt.Println(args[1:])
+				//fmt.Println(args[1:])
 				args = cmd.Flag.Args()
-				fmt.Println(args)
+				//fmt.Println(args)
 			}
 			cmd.Run(cmd, args)
 			os.Exit(0)

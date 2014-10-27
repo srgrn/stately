@@ -1,8 +1,10 @@
 package main
 
 import (
+	"crypto/tls"
 	"fmt"
 	"github.com/BurntSushi/toml"
+	"net/http"
 )
 
 var cmdGet = &Command{
@@ -32,10 +34,26 @@ func create(s source, ch chan bool) {
 
 func runGet(cmd *Command, args []string) {
 	var config Config
-	if _, err := toml.DecodeFile(*getP, &config); err != nil {
-		fmt.Println(err)
-		return
+	if *getR != "" {
+		fmt.Println("working with remote definition file")
+		tr := &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		}
+		client := &http.Client{Transport: tr}
+		res, _ := client.Get(*getR)
+
+		if _, err := toml.DecodeReader(res.Body, &config); err != nil {
+			fmt.Println(err)
+			return
+		}
+		res.Body.Close()
+	} else {
+		if _, err := toml.DecodeFile(*getP, &config); err != nil {
+			fmt.Println(err)
+			return
+		}
 	}
+
 	done := make(chan bool, len(config.Sources))
 	for _, source := range config.Sources {
 		source.set_type()
