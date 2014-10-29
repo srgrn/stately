@@ -1,0 +1,9 @@
+{
+  "name": "stately",
+  "version": "0.1.1",
+  "devDependencies": {
+    "grunt": "*",
+    "grunt-contrib-watch": "*"
+  }
+
+}

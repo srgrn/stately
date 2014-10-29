@@ -23,8 +23,9 @@ type source struct {
 }
 
 type Config struct {
-	Name    string
-	Sources []source
+	Name       string
+	BaseBranch string
+	Sources    []source
 }
 
 func (s *source) set_type() {
@@ -90,7 +91,7 @@ func main() {
 
 	args := flag.Args()
 	if len(args) < 1 {
-		fmt.Println("Here be usage")
+		usage()
 		os.Exit(0)
 	}
 	for _, cmd := range commands {
@@ -100,9 +101,9 @@ func main() {
 				args = args[1:]
 			} else {
 				cmd.Flag.Parse(args[1:])
-				fmt.Println(args[1:])
+				//fmt.Println(args[1:])
 				args = cmd.Flag.Args()
-				fmt.Println(args)
+				//fmt.Println(args)
 			}
 			cmd.Run(cmd, args)
 			os.Exit(0)
@@ -112,6 +113,18 @@ func main() {
 	fmt.Fprintf(os.Stderr, "stately: unknown subcommand %q\n", args[0])
 	os.Exit(2)
 
+}
+
+func usage() {
+	var usage_string = `
+Stately is a utility to assist with handling workspaces containing directories from several source repositories.
+it contains the following commands:
+get - clones/checkout all code according to configuration file.
+update - updates an already existing directory with changes from scm.
+freeze - create a configuration file from a given directory.
+change_branch - change the branch of all or specific one of the project and updates the configuration file.
+	`
+	fmt.Println(usage_string)
 }
 
 var commands = []*Command{
