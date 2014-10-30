@@ -1,11 +1,7 @@
 package main
 
 import (
-	"crypto/tls"
 	"fmt"
-	"github.com/BurntSushi/toml"
-	"net/http"
-	"strings"
 )
 
 var cmdGet = &Command{
