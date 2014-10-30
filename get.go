@@ -30,7 +30,7 @@ func create(s source, ch chan bool) {
 
 func runGet(cmd *Command, args []string) {
 
-	config, err := proccessConfig(args[0])
+	config, err := proccessConfig(args[0]) // moved to proccessConfig.go to support additional types and keywords
 	if err != nil {
 		return
 	}
