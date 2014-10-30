@@ -1,0 +1,10 @@
+name = "test"
+
+[[sources]]
+url = "git@github.com:srgrn/google-drive-trash-cleaner.git"
+target = "trash"
+
+[[sources]]
+url = "git@github.com:srgrn/stately.git"
+target = "stately"
+branch = "no-more-lib"
