@@ -105,5 +105,18 @@ func expand(match map[string]string, s string) string {
 }
 
 func set_type(s *source) {
-	s.SourceType = vcsGit
+	if s.Url != "" {
+		s.SourceType = get_type_by_url(s.Url)
+	} else if s.Target != "" {
+		s.SourceType = get_type_by_dir(s.Target)
+	} else {
+		fmt.Fprintf(os.Stderr, "# cannot check source type defaults to git")
+		s.SourceType = vcsGit
+	}
+}
+func get_type_by_url(url string) *vcs {
+	return nil
+}
+func get_type_by_dir(url string) *vcs {
+	return nil
 }
