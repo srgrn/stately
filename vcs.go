@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"regexp"
 	"strings"
 )
 
@@ -15,6 +16,7 @@ type vcs struct {
 	createCmd      string // command to download a fresh copy of a repository
 	downloadCmd    string // command to download updates into an existing repository
 	BaseBranchName string // the name of the default branch/revision to get when non is given
+	matchRegexUrl  string // a regex to match a url for the vcs type
 }
 
 func (v *vcs) create(dir, repo, branch string) error {
@@ -104,6 +106,11 @@ func expand(match map[string]string, s string) string {
 	return s
 }
 
+var known_types = []*vcs{
+	vcsGit,
+	vcsSvn,
+}
+
 func set_type(s *source) {
 	if s.Url != "" {
 		s.SourceType = get_type_by_url(s.Url)
@@ -115,8 +122,15 @@ func set_type(s *source) {
 	}
 }
 func get_type_by_url(url string) *vcs {
+	for _, v := range known_types {
+		res, _ := regexp.MatchString(v.matchRegexUrl, url)
+		if res {
+			return v
+		}
+	}
 	return nil
 }
-func get_type_by_dir(url string) *vcs {
+func get_type_by_dir(path string) *vcs {
+	// will use the specific directory type that should be in the target directory already
 	return nil
 }
