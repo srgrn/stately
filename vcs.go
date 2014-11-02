@@ -114,8 +114,14 @@ var known_types = []*vcs{
 func set_type(s *source) {
 	if s.Url != "" {
 		s.SourceType = get_type_by_url(s.Url)
+		if s.SourceType == nil {
+			fmt.Println("Cannot choose source type")
+		}
 	} else if s.Target != "" {
 		s.SourceType = get_type_by_dir(s.Target)
+		if s.SourceType == nil {
+			fmt.Println("Cannot choose source type")
+		}
 	} else {
 		fmt.Fprintf(os.Stderr, "# cannot check source type defaults to git")
 		s.SourceType = vcsGit
