@@ -28,10 +28,6 @@ type Config struct {
 	Sources    []source
 }
 
-func (s *source) set_type() {
-	s.SourceType = vcsGit
-}
-
 type Command struct {
 	// Run runs the command.
 	// The args are the arguments after the command name.

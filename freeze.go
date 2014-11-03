@@ -39,10 +39,12 @@ func runFreeze(cmd *Command, args []string) {
 	for _, f := range files {
 		if f.IsDir() {
 			//fmt.Println(f.Name())
-			var s source
-			sp := &source{}
-			s.Target = f.Name()
-			sp.set_type()
+			var getterS, s source
+			getterS.Target = f.Name()
+			fmt.Println("working on", f.Name())
+			getterS.set_type()
+			s.Target = getterS.Target
+			s.Url = getterS.SourceType.urlGetFunc(getterS.Target, getterS.SourceType)
 			//s.Branch = sp.get_branch()
 			config.Sources = append(config.Sources, s)
 		}

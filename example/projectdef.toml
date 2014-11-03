@@ -7,4 +7,4 @@ target = "trash"
 [[sources]]
 url = "git@github.com:srgrn/stately.git"
 target = "stately"
-branch = "no-more-lib"
+branch = "master"
