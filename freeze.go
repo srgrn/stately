@@ -8,19 +8,20 @@ import (
 )
 
 var cmdFreeze = &Command{
-	UsageLine: "freeze targetfile",
+	UsageLine: "freeze [-b baseBranch] <targetfile>",
 	Short:     "freezes the directory structure of the current directory into a project definiton file ",
 	Long: `
 The freeze command allows you to freeze the current directory into a project definition file
 it goes over each directory in the current directory tries to guess the relevant source control for the directioy,
 it then creates prints the results into a file.
 	`,
-	CustomFlags: false,
-	Run:         runFreeze,
+	CustomFlags: true,
 }
 
-func init() {
+var freezeB = cmdFreeze.Flag.String("b", "", "Specify base branch if required")
 
+func init() {
+	cmdFreeze.Run = runFreeze // break init loop
 }
 
 func runFreeze(cmd *Command, args []string) {
@@ -45,6 +46,7 @@ func runFreeze(cmd *Command, args []string) {
 			getterS.set_type()
 			s.Target = getterS.Target
 			s.Url = getterS.SourceType.urlGetFunc(getterS.Target, getterS.SourceType)
+			s.Branch = getterS.SourceType.branchGetFunc(getterS.Target, getterS.SourceType)
 			//s.Branch = sp.get_branch()
 			config.Sources = append(config.Sources, s)
 		}
@@ -53,6 +55,9 @@ func runFreeze(cmd *Command, args []string) {
 	if err != nil {
 	}
 	config.Name = filepath.Base(pwd)
+	if *freezeB != "" {
+		config.BaseBranch = *freezeB
+	}
 	file, err := os.Create(newFileName)
 	if err != nil {
 		// handle the error here

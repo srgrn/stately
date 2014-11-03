@@ -19,6 +19,7 @@ type vcs struct {
 	matchRegexUrl       string // a regex to match a url for the vcs type
 	vcsTypeDirMatchFunc func(path string) (b bool, err error)
 	urlGetFunc          func(path string, self *vcs) string
+	branchGetFunc       func(path string, self *vcs) string
 }
 
 func (v *vcs) create(dir, repo, branch string) error {
@@ -56,6 +57,14 @@ var vcsGit = &vcs{
 		//fmt.Println(res[0])
 		//fmt.Println(s)
 		return url[0]
+	},
+	branchGetFunc: func(path string, self *vcs) string {
+		output, _ := self.runOutput(path, "status")
+		lines := strings.Split(string(output), "\n")
+		branch := strings.Split(lines[0], " ")
+		//fmt.Println(res[0])
+		//fmt.Println(s)
+		return branch[2]
 	},
 }
 
