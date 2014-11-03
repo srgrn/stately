@@ -1,7 +1,5 @@
 // Stately is a commandline multiplatform tool for handling projects that contains several repositories.
-// Command get
-// Command freeze
-// Command update
+
 package main
 
 import (
