@@ -44,7 +44,7 @@ func runFreeze(cmd *Command, args []string) {
 			fmt.Println("working on", f.Name())
 			getterS.set_type()
 			s.Target = getterS.Target
-			s.Url = getterS.get_url()
+			s.Url = getterS.SourceType.urlGetFunc(getterS.Target, getterS.SourceType)
 			//s.Branch = sp.get_branch()
 			config.Sources = append(config.Sources, s)
 		}

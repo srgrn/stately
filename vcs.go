@@ -18,7 +18,7 @@ type vcs struct {
 	BaseBranchName      string // the name of the default branch/revision to get when non is given
 	matchRegexUrl       string // a regex to match a url for the vcs type
 	vcsTypeDirMatchFunc func(path string) (b bool, err error)
-	urlFindFunc         func(path string) string // gets the url of the remote end from a local directory
+	urlGetFunc          func(path string, self *vcs) string
 }
 
 func (v *vcs) create(dir, repo, branch string) error {
@@ -31,7 +31,7 @@ func (v *vcs) download(dir string) error {
 }
 
 func git_dir_type(path string) (b bool, err error) {
-	fmt.Printf(path, "%s%s.git", path, os.PathSeparator)
+	path = fmt.Sprintf("%s%s.git", path, os.PathSeparator)
 	b, err = exists(path)
 	return b, err
 }
@@ -44,13 +44,18 @@ var vcsGit = &vcs{
 	downloadCmd:    "pull --ff-only",
 	BaseBranchName: "master",
 	vcsTypeDirMatchFunc: func(path string) (b bool, err error) {
-		fmt.Printf(path, "%s%s.git", path, os.PathSeparator)
+		fmt.Sprintf(path, "%s%s.git", path, os.PathSeparator)
 		b, err = exists(path)
 		return b, err
 	},
-	urlFindFunc: func(path string) string {
-		//"remote -v origin"
-		return ""
+	urlGetFunc: func(path string, self *vcs) string {
+		r, _ := regexp.Compile("(\\w+://){0,1}(\\w+@)([\\w\\d\\.]+)(:[\\d]+){0,1}/*(.*)")
+		output, _ := self.runOutput(path, "remote -v")
+		s := string(output)
+		url := strings.Split(r.FindString(s), " ")
+		//fmt.Println(res[0])
+		//fmt.Println(s)
+		return url[0]
 	},
 }
 
@@ -98,7 +103,7 @@ func (v *vcs) run1(dir string, cmdline string, keyval []string, verbose bool) ([
 	_, err := exec.LookPath(v.cmd)
 	if err != nil {
 		fmt.Fprintf(os.Stderr,
-			"go: missing %s command. See http://golang.org/s/gogetcmd\n",
+			"stately: missing %s command.\n",
 			v.name)
 		return nil, err
 	}
