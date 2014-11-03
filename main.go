@@ -1,3 +1,7 @@
+// Stately is a commandline multiplatform tool for handling projects that contains several repositories.
+// Command get
+// Command freeze
+// Command update
 package main
 
 import (
@@ -28,6 +32,7 @@ type Config struct {
 	Sources    []source
 }
 
+// A Command is an implementation of a command
 type Command struct {
 	// Run runs the command.
 	// The args are the arguments after the command name.
