@@ -49,6 +49,7 @@ var vcsGit = &vcs{
 		b, err = exists(path)
 		return b, err
 	},
+	matchRegexUrl: "(\\w+://){0,1}(\\w+@)([\\w\\d\\.]+)(:[\\d]+){0,1}/*(.*)",
 	urlGetFunc: func(path string, self *vcs) string {
 		r, _ := regexp.Compile("(\\w+://){0,1}(\\w+@)([\\w\\d\\.]+)(:[\\d]+){0,1}/*(.*)")
 		output, _ := self.runOutput(path, "remote -v")
@@ -75,6 +76,7 @@ var vcsSvn = &vcs{
 	createCmd:      "checkout {repo} {dir} -r {branch}",
 	downloadCmd:    "update",
 	BaseBranchName: "HEAD",
+	matchRegexUrl:  "svn(\\+.*)?://",
 	vcsTypeDirMatchFunc: func(path string) (b bool, err error) {
 		fmt.Printf(path, "%s%s.svn", path, os.PathSeparator)
 		b, err = exists(path)
@@ -155,8 +157,8 @@ func expand(match map[string]string, s string) string {
 }
 
 var known_types = []*vcs{
-	vcsGit,
 	vcsSvn,
+	vcsGit,
 }
 
 func (s *source) get_url() string {
