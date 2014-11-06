@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"regexp"
 	"strings"
 )
@@ -45,7 +46,7 @@ var vcsGit = &vcs{
 	downloadCmd:    "pull --ff-only",
 	BaseBranchName: "master",
 	vcsTypeDirMatchFunc: func(path string) (b bool, err error) {
-		fmt.Sprintf(path, "%s%s.git", path, os.PathSeparator)
+		path = filepath.Join(path, ".git")
 		b, err = exists(path)
 		return b, err
 	},
@@ -78,9 +79,23 @@ var vcsSvn = &vcs{
 	BaseBranchName: "HEAD",
 	matchRegexUrl:  "svn(\\+.*)?://",
 	vcsTypeDirMatchFunc: func(path string) (b bool, err error) {
-		fmt.Printf(path, "%s%s.svn", path, os.PathSeparator)
+		path = filepath.Join(path, ".svn")
+		fmt.Println("svn:", path)
 		b, err = exists(path)
 		return b, err
+	},
+	urlGetFunc: func(path string, self *vcs) string {
+		r, _ := regexp.Compile("URL:\\s(.*)")
+		output, _ := self.runOutput(path, "info")
+		s := string(output)
+		url := strings.Replace(r.FindString(s), "URL: ", "", -1)
+		//fmt.Println(res[0])
+		fmt.Println(url)
+		return url
+	},
+	branchGetFunc: func(path string, self *vcs) string {
+		// here should be a function to return the revision number but i'm not sure of its usfullness
+		return ""
 	},
 }
 
