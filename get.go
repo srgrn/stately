@@ -2,17 +2,20 @@ package main
 
 import (
 	"fmt"
+	"os"
 )
 
 var cmdGet = &Command{
-	UsageLine: "get <path to project definition file>",
+	UsageLine: "get [-T TargetDir] <path to project definition file>",
 	Short:     "create the directory structure of a project according to project definition file",
 	Long: `
 The get command parse the project definition file and downloads the relevant sources into current directory.
 Running without any flag will search for a file called projectdef.toml in the current directory.
 	`,
-	CustomFlags: false,
+	CustomFlags: true,
 }
+
+var getT = cmdGet.Flag.String("T", "", "allow choosing a different directory")
 
 func init() {
 	cmdGet.Run = runGet // break init loop
@@ -31,6 +34,10 @@ func runGet(cmd *Command, args []string) {
 		return
 	}
 	done := make(chan bool, len(config.Sources))
+	if *getT != "" {
+		os.Mkdir(*getT, 0777)
+		os.Chdir(*getT)
+	}
 	for _, source := range config.Sources {
 		source.set_type()
 		if source.Branch == "" {

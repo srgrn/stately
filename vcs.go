@@ -80,7 +80,7 @@ var vcsSvn = &vcs{
 	matchRegexUrl:  "svn(\\+.*)?://",
 	vcsTypeDirMatchFunc: func(path string) (b bool, err error) {
 		path = filepath.Join(path, ".svn")
-		fmt.Println("svn:", path)
+		//fmt.Println("svn:", path)
 		b, err = exists(path)
 		return b, err
 	},
@@ -185,13 +185,13 @@ func (s *source) get_url() string {
 }
 func (s *source) set_type() {
 	if s.Url != "" {
-		fmt.Println("Using url")
+		//fmt.Println("Using url")
 		s.SourceType = get_type_by_url(s.Url)
 		if s.SourceType == nil {
 			fmt.Println("Cannot choose source type")
 		}
 	} else if s.Target != "" {
-		fmt.Println("Using Target")
+		//fmt.Println("Using Target")
 		s.SourceType = get_type_by_dir(s.Target)
 		if s.SourceType == nil {
 			fmt.Println("Cannot choose source type")
