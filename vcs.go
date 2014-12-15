@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -183,23 +184,27 @@ func (s *source) get_url() string {
 	// here get the url of the source
 	return ""
 }
-func (s *source) set_type() {
+func (s *source) set_type() error {
+	err := errors.New("Error:Error cannot set type")
 	if s.Url != "" {
 		//fmt.Println("Using url")
 		s.SourceType = get_type_by_url(s.Url)
 		if s.SourceType == nil {
-			fmt.Println("Cannot choose source type")
+			fmt.Println("Cannot choose source type 1")
+			return err
 		}
 	} else if s.Target != "" {
 		//fmt.Println("Using Target")
 		s.SourceType = get_type_by_dir(s.Target)
 		if s.SourceType == nil {
-			fmt.Println("Cannot choose source type")
+			fmt.Println("Cannot choose source type 2")
+			return err
 		}
 	} else {
-		fmt.Fprintf(os.Stderr, "# cannot check source type defaults to git")
+		fmt.Println("# cannot check source type defaults to git")
 		s.SourceType = vcsGit
 	}
+	return nil
 }
 func get_type_by_url(url string) *vcs {
 	for _, v := range known_types {

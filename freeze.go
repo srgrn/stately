@@ -43,12 +43,17 @@ func runFreeze(cmd *Command, args []string) {
 			var getterS, s source
 			getterS.Target = f.Name()
 			fmt.Println("working on", f.Name())
-			getterS.set_type()
-			s.Target = getterS.Target
-			s.Url = getterS.SourceType.urlGetFunc(getterS.Target, getterS.SourceType)
-			s.Branch = getterS.SourceType.branchGetFunc(getterS.Target, getterS.SourceType)
-			//s.Branch = sp.get_branch()
-			config.Sources = append(config.Sources, s)
+			err = getterS.set_type()
+			if err == nil {
+				s.Target = getterS.Target
+				s.Url = getterS.SourceType.urlGetFunc(getterS.Target, getterS.SourceType)
+				s.Branch = getterS.SourceType.branchGetFunc(getterS.Target, getterS.SourceType)
+				//s.Branch = sp.get_branch()
+				config.Sources = append(config.Sources, s)
+			} else {
+				fmt.Println(err)
+			}
+
 		}
 	}
 	pwd, err := os.Getwd()
