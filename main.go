@@ -4,12 +4,28 @@ package main
 
 import (
 	"fmt"
+	log "github.com/Sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+	"os"
+	"os/user"
+	"reflect"
 )
 
 var Config string
 
 const VERSION = "v0.1.0"
+
+func init() {
+	// Log as JSON instead of the default ASCII formatter.
+	log.SetFormatter(&log.JSONFormatter{})
+
+	// Output to stderr instead of stdout, could also be a file.
+	log.SetOutput(os.Stderr)
+
+	// Only log the warning severity or above.
+	log.SetLevel(log.DebugLevel)
+}
 
 func main() {
 	var statelyCmd = &cobra.Command{
@@ -17,8 +33,28 @@ func main() {
 		Short: "Stately is a utility to assist with handling workspaces containing directories from several source repositories.",
 		Long: `Stately was originaly designed to assist in getting multiple repositories at the same time.
 		it has copied lots of functionalty from the go command and the repo tool, today it has added functionalty`,
-		Run: func(cmd *cobra.Command, args []string) {
+		PersistentPreRun: func(cmd *cobra.Command, args []string) {
+			var homedir string
+			currentUser, err := user.Current()
+			if err != nil {
+				homedir = currentUser.HomeDir
+			}
 			// create config if it is missing
+			if Config == "" {
+				viper.SetConfigName("stately")
+				viper.AddConfigPath(".")
+				viper.AddConfigPath("../")
+				viper.AddConfigPath(homedir)
+				log.WithField("Config", "stately").Debugln("searching for config file")
+			} else {
+				viper.SetConfigFile(Config)
+				log.WithField("Config", Config).Debugln("Using config file from flag: ", Config)
+			}
+			err = viper.ReadInConfig() // Find and read the config file
+			if err != nil {            // Handle errors reading the config file
+				// _ = "breakpoint"
+				fmt.Println(reflect.TypeOf(err), err)
+			}
 		},
 	}
 	var versionCmd = &cobra.Command{
