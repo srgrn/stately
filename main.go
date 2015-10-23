@@ -1,134 +1,47 @@
 // Stately is a commandline multiplatform tool for handling projects that contains several repositories.
-
+// it will copy the functionalty given in the myrepos tool
 package main
 
 import (
-	"flag"
 	"fmt"
-	"os"
-	"strings"
+	"github.com/spf13/cobra"
 )
 
-var versionFlag bool
+var Config string
 
-const branch = "v0.1.0"
-
-func Version() string {
-	return branch
-}
-
-type source struct {
-	Target     string
-	Url        string
-	Branch     string
-	SourceType *vcs
-}
-
-type Config struct {
-	Name       string
-	BaseBranch string
-	Sources    []source
-}
-
-// A Command is an implementation of a command
-type Command struct {
-	// Run runs the command.
-	// The args are the arguments after the command name.
-	Run func(cmd *Command, args []string)
-
-	// UsageLine is the one-line usage message.
-	// The first word in the line is taken to be the command name.
-	UsageLine string
-
-	// Short is the short description shown in the 'stately help' output.
-	Short string
-
-	// Long is the long message shown in the 'stately help <this-command>' output.
-	Long string
-
-	// Flag is a set of flags specific to this command.
-	Flag flag.FlagSet
-
-	// CustomFlags indicates that the command will do its own
-	// flag parsing.
-	CustomFlags bool
-}
-
-// Name returns the command's name: the first word in the usage line.
-func (c *Command) Name() string {
-	name := c.UsageLine
-	i := strings.Index(name, " ")
-	if i >= 0 {
-		name = name[:i]
-	}
-	return name
-}
-
-func (c *Command) Usage() {
-	fmt.Fprintf(os.Stderr, "usage: %s\n\n", c.UsageLine)
-	fmt.Fprintf(os.Stderr, "%s\n", strings.TrimSpace(c.Long))
-	os.Exit(2)
-}
-
-// Runnable reports whether the command can be run; otherwise
-// it is a documentation pseudo-command such as importpath.
-func (c *Command) Runnable() bool {
-	return c.Run != nil
-}
-
-//var configFile string
+const VERSION = "v0.1.0"
 
 func main() {
-	flag.BoolVar(&versionFlag, "version", false, "Show the version")
-	flag.BoolVar(&versionFlag, "v", false, "Show the version")
-
-	flag.Parse()
-	if versionFlag {
-		fmt.Println("Stately ", Version())
-		os.Exit(0)
+	var statelyCmd = &cobra.Command{
+		Use:   "stately",
+		Short: "Stately is a utility to assist with handling workspaces containing directories from several source repositories.",
+		Long: `Stately was originaly designed to assist in getting multiple repositories at the same time.
+		it has copied lots of functionalty from the go command and the repo tool, today it has added functionalty`,
+		Run: func(cmd *cobra.Command, args []string) {
+			// create config if it is missing
+		},
 	}
-
-	args := flag.Args()
-	if len(args) < 1 {
-		usage()
-		os.Exit(0)
+	var versionCmd = &cobra.Command{
+		Use:   "version",
+		Short: "Print the version number of stately",
+		Long:  `This is the stately version number`,
+		Run: func(cmd *cobra.Command, args []string) {
+			fmt.Printf("Stately Dev %s\n", VERSION)
+		},
 	}
-	for _, cmd := range commands {
-		if cmd.Name() == args[0] && cmd.Run != nil {
-			cmd.Flag.Usage = func() { cmd.Usage() }
-			if !cmd.CustomFlags {
-				args = args[1:]
-			} else {
-				cmd.Flag.Parse(args[1:])
-				//fmt.Println(args[1:])
-				args = cmd.Flag.Args()
-				//fmt.Println(args)
-			}
-			cmd.Run(cmd, args)
-			os.Exit(0)
-			return
-		}
+	var registerCmd = &cobra.Command{
+		Use:   "register",
+		Short: "register a repository in stately config file",
+		Long: `The register command allows you to add a new repo to the config file.
+		it will first search a config file in the following order:
+			current folder -> parent folder -> default config file.
+		you can also specify the config file to work on specifically and it will be create if it doesn't exist`,
+		Run: func(cmd *cobra.Command, args []string) {
+			fmt.Printf("Stately Dev %s\n", VERSION)
+		},
 	}
-	fmt.Fprintf(os.Stderr, "stately: unknown subcommand %q\n", args[0])
-	os.Exit(2)
-
-}
-
-func usage() {
-	var usage_string = `
-Stately is a utility to assist with handling workspaces containing directories from several source repositories.
-it contains the following commands:
-get - clones/checkout all code according to configuration file.
-update - updates an already existing directory with changes from scm.
-freeze - create a configuration file from a given directory.
-change_branch - change the branch of all or specific one of the project and updates the configuration file.
-	`
-	fmt.Println(usage_string)
-}
-
-var commands = []*Command{
-	cmdGet,
-	cmdUpdate,
-	cmdFreeze,
-	//cmdChangeBranch,
+	statelyCmd.PersistentFlags().StringVarP(&Config, "config", "c", "", "Specific config file for stately.")
+	statelyCmd.AddCommand(versionCmd)
+	statelyCmd.AddCommand(registerCmd)
+	statelyCmd.Execute()
 }
