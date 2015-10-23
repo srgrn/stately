@@ -9,7 +9,6 @@ import (
 	"github.com/spf13/viper"
 	"os"
 	"os/user"
-	"reflect"
 )
 
 var Config string
@@ -37,7 +36,11 @@ func main() {
 			var homedir string
 			currentUser, err := user.Current()
 			if err != nil {
+				log.Warningln("cannot get current user will use . as homedir")
+			} else {
 				homedir = currentUser.HomeDir
+				log.WithField("Home", homedir).Debugln("Got user homedir")
+
 			}
 			// create config if it is missing
 			if Config == "" {
@@ -53,7 +56,7 @@ func main() {
 			err = viper.ReadInConfig() // Find and read the config file
 			if err != nil {            // Handle errors reading the config file
 				// _ = "breakpoint"
-				fmt.Println(reflect.TypeOf(err), err)
+				log.WithField("err", err).Warningln("Error during reading config")
 			}
 		},
 	}
